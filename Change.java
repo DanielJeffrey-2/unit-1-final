@@ -1,5 +1,5 @@
 /*
- * This program converts a dollar amount between $0.01 and $99.99
+ * This program converts a dollar amount between $0.01 and $999.99
  * into change
  * 
  * @author  D. Jeffrey
@@ -31,37 +31,30 @@ public final class Change {
     }
 
     /**
-     * This function gets cost and payment of items, returns change
-     *
-     * @param args No args will be used
+     * This function prints out the amount of each currency type needed
+     * Uses parameter money Hashmap, returns none
      */
-    public static int getChange() {
-        // variables
-        float change;
-        int changeAsInt;
+    public static void moneyOutput(Map<String, Integer> money) {
+        // process
+        // gives set containing all keys in money LinkedHashMap, loops through
+        for (String key : money.keySet()) {
 
-        // input
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter the cost of your items: ");
-        float cost = scanner.nextFloat();
-        System.out.print("Amount of payment: ");
-        float payment = scanner.nextFloat();
-
-        // calculates change in cents, converts to int
-        change = payment - cost;
-        System.out.printf("Your change: $%.2f%n", change);
-        changeAsInt = (int) (change * 100);
-
-        scanner.close();
-
-        return changeAsInt;
+            /* prints amount of each currency followed by the type of currency,
+            * accounting for multiples
+            */
+            if (money.get(key) > 1) {
+                System.out.println(" " + money.get(key) + " " + key + "s");
+            } else {
+                System.out.println(" " + money.get(key) + " " + key);
+            }
+        }
     }
 
     /**
      * This function determines what currencies are needed
-     *
+     * Uses int change as parameter, returns none
      */
-    public static Map<String, Integer> currencyCalculator(int change) {
+    public static void currencyCalculator(int change) {
         // variables
         String[] currencyTypes = {
             "$100 bill",
@@ -86,7 +79,8 @@ public final class Change {
         // process
         /* loops through currencyValues, checks if change is divisible by
         * different currencies, if yes then appends currencyType and
-        * amountOfCurrency to Hashmap
+        * amountOfCurrency to Hashmap and subtracts that currency
+        * from the change
         */
         for (int i = 0; i < currencyValues.length; i++) {
             int amountOfCurrency = change / currencyValues[i];
@@ -96,24 +90,56 @@ public final class Change {
                 change -= currencyValues[i] * amountOfCurrency;
             }
         }
-
-        return money;
+        // calls output function using linkedhashmap as an argument
+        moneyOutput(money);
     }
 
     /**
-     * This function prints out the amount of each currency type needed
-     * Uses parameter money Hashmap, returns none
+     * This function gets cost and payment of items, returns change
+     *
+     * @param args No args will be used
      */
-    public static void moneyOutput(Map<String, Integer> money) {
+    public static void getChange() {
+        // variables
+        float change;
+        int changeAsInt;
+
+        // create Scanner object for user input
+        Scanner scanner = new Scanner(System.in);
+
+        // input
+        System.out.print("Enter the cost of your items: ");
+        String costAsString = scanner.nextLine();
+        System.out.print("Amount of payment: ");
+        String paymentAsString = scanner.nextLine();
+
         // process
-        // gives set containing all keys in money LinkedHashMap, loops through
-        for (String key : money.keySet()) {
-            if (money.get(key) > 1) {
-                System.out.println(" " + money.get(key) + " " + key + "s");
+        try {
+            float cost = Float.parseFloat(costAsString);
+            float payment = Float.parseFloat(paymentAsString);
+
+            // calculates change in cents, converts to int
+            change = payment - cost;
+            System.out.printf("Your change: $%.2f%n", change);
+            changeAsInt = (int) (change * 100);
+
+            if (changeAsInt == 0) {
+                System.out.printf("You get no change.");
+            } else if (changeAsInt > 99999) {
+                System.out.printf("There is not enough change in the register, tough luck!");
+            } else if (changeAsInt < 0) {
+                System.out.printf("Nice try, bucko.");
+
             } else {
-                System.out.println(" " + money.get(key) + " " + key);
+                System.out.printf("Your change: $%.2f%n", change);
+                Map<String, Integer> money = currencyCalculator(changeAsInt);
             }
+        } catch (NumberFormatException e) {
+            System.out.printf("The error was: %s.%n", e.getMessage());
+        } finally {
+            System.out.println("\nDone.");
         }
+        scanner.close();
     }
 
     /**
@@ -124,11 +150,5 @@ public final class Change {
     public static void main(final String[] args) {
         // variables
         int change = getChange();
-        Map<String, Integer> money = currencyCalculator(change);
-        moneyOutput(money);
-
-
-
-        System.out.println("\nDone.");
     }
 }

@@ -1,22 +1,45 @@
 /*
  * This program converts a dollar amount between $0.01 and $999.99
- * into change
- * 
+ * into change.
+ *
  * @author  D. Jeffrey
  * @version 1.0
  * @since   2025-10-20
  */
 
-/**
- * This is the Change game program
- */
-
 import java.util.Scanner;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * This is the Change game program.
+ */
 public final class Change {
+    /**
+     * Creates list for currency values.
+     */
+    private static final int[] CURRENCYVALUES = {
+            10000,
+            5000,
+            2000,
+            1000,
+            500,
+            200,
+            100,
+            25,
+            10,
+            5,
+    };
+
+    /**
+     * Creates maxchange to limit total change.
+     */
+    private static final int MAXCHANGE = 99999;
+
+    /**
+     * Creates number to multiply change by to get cents.
+     */
+    private static final int CENTSCONVERT = 100;
 
     /**
      * Prevent instantiation.
@@ -32,16 +55,19 @@ public final class Change {
 
     /**
      * This function prints out the amount of each currency type needed
-     * Uses parameter money Hashmap, returns none
+     * Uses parameter money Hashmap, returns none.
+     *
+     * @param money linkedHashMap for money
      */
-    public static void moneyOutput(Map<String, Integer> money) {
+    public static void moneyOutput(final Map<String, Integer> money) {
         // process
         // gives set containing all keys in money LinkedHashMap, loops through
         for (String key : money.keySet()) {
 
-            /* prints amount of each currency followed by the type of currency,
-            * accounting for multiples
-            */
+            /*
+             * prints amount of each currency followed by the type of currency,
+             * accounting for multiples
+             */
             if (money.get(key) > 1) {
                 System.out.println(" " + money.get(key) + " " + key + "s");
             } else {
@@ -52,10 +78,13 @@ public final class Change {
 
     /**
      * This function determines what currencies are needed
-     * Uses int change as parameter, returns none
+     * Uses int change as parameter, returns none.
+     *
+     * @param changeFinal change value as an integer
      */
-    public static void currencyCalculator(int change) {
+    public static void currencyCalculator(final int changeFinal) {
         // variables
+        int change = changeFinal;
         String[] currencyTypes = {
             "$100 bill",
             "$50 bill",
@@ -69,25 +98,23 @@ public final class Change {
             "Nickel",
         };
 
-        int currencyValues[] = {
-            10000, 5000, 2000, 1000, 500, 200, 100, 25, 10, 5
-        };
-
         // creates LinkedHashMap called money, really just a dictionary
         LinkedHashMap<String, Integer> money = new LinkedHashMap<>();
 
         // process
-        /* loops through currencyValues, checks if change is divisible by
-        * different currencies, if yes then appends currencyType and
-        * amountOfCurrency to Hashmap and subtracts that currency
-        * from the change
-        */
-        for (int i = 0; i < currencyValues.length; i++) {
-            int amountOfCurrency = change / currencyValues[i];
+        /*
+         * loops through currencyValues, checks if change is divisible by
+         * different currencies, if yes then appends currencyType and
+         * amountOfCurrency to Hashmap and subtracts that currency
+         * from the change
+         */
+        for (int currencyValue = 0; currencyValue < CURRENCYVALUES.length;
+        currencyValue++) {
+            int amountOfCurrency = change / CURRENCYVALUES[currencyValue];
 
             if (amountOfCurrency >= 1) {
-                money.put(currencyTypes[i], amountOfCurrency);
-                change -= currencyValues[i] * amountOfCurrency;
+                money.put(currencyTypes[currencyValue], amountOfCurrency);
+                change -= CURRENCYVALUES[currencyValue] * amountOfCurrency;
             }
         }
         // calls output function using linkedhashmap as an argument
@@ -95,9 +122,9 @@ public final class Change {
     }
 
     /**
-     * This function gets cost and payment of items, returns change
+     * This function gets cost and payment of items, calls other function
+     * to find necessary bills/coins.
      *
-     * @param args No args will be used
      */
     public static void getChange() {
         // variables
@@ -121,18 +148,20 @@ public final class Change {
             // calculates change in cents, converts to int
             change = payment - cost;
             System.out.printf("Your change: $%.2f%n", change);
-            changeAsInt = (int) (change * 100);
+            changeAsInt = (int) (change * CENTSCONVERT);
 
-            if (changeAsInt == 0) {
+            if (cost < 0 || payment < 0) {
+                System.out.printf("Invalid cost/payment.");
+            } else if (changeAsInt == 0) {
                 System.out.printf("You get no change.");
-            } else if (changeAsInt > 99999) {
-                System.out.printf("There is not enough change in the register, tough luck!");
+            } else if (changeAsInt > MAXCHANGE) {
+                System.out.printf("There is not enough change in the register"
+                + ", tough luck!");
             } else if (changeAsInt < 0) {
                 System.out.printf("Nice try, bucko.");
-
             } else {
                 System.out.printf("Your change: $%.2f%n", change);
-                Map<String, Integer> money = currencyCalculator(changeAsInt);
+                currencyCalculator(changeAsInt);
             }
         } catch (NumberFormatException e) {
             System.out.printf("The error was: %s.%n", e.getMessage());
@@ -148,7 +177,7 @@ public final class Change {
      * @param args No args will be used
      */
     public static void main(final String[] args) {
-        // variables
-        int change = getChange();
+        // calls getChange()
+        getChange();
     }
 }

@@ -130,6 +130,8 @@ public final class Change {
         // variables
         float change;
         int changeAsInt;
+        int costInt;
+        int paymentInt;
 
         // create Scanner object for user input
         Scanner scanner = new Scanner(System.in);
@@ -145,13 +147,15 @@ public final class Change {
             float cost = Float.parseFloat(costAsString);
             float payment = Float.parseFloat(paymentAsString);
 
+            costInt = (int) Math.round(cost * CENTSCONVERT);
+            paymentInt = (int) Math.round(payment * CENTSCONVERT);
+
             // calculates change in cents, converts to int
             change = payment - cost;
-            System.out.printf("Your change: $%.2f%n", change);
-            changeAsInt = (int) (change * CENTSCONVERT);
+            changeAsInt = paymentInt - costInt;
 
             if (cost < 0 || payment < 0) {
-                System.out.printf("Invalid cost/payment.");
+                System.out.printf("Invalid cost/payment.\n");
             } else if (changeAsInt == 0) {
                 System.out.printf("You get no change.");
             } else if (changeAsInt > MAXCHANGE) {
@@ -166,7 +170,7 @@ public final class Change {
         } catch (NumberFormatException e) {
             System.out.printf("The error was: %s.%n", e.getMessage());
         } finally {
-            System.out.println("\nDone.");
+            System.out.println("\n\nDone.");
         }
         scanner.close();
     }
